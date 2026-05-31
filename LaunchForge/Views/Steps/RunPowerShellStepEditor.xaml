@@ -1,0 +1,24 @@
+<UserControl x:Class="LaunchForge.Views.Steps.RunPowerShellStepEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="12" DataContext="{Binding}">
+
+        <TextBlock Text="PowerShell script" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Script, UpdateSourceTrigger=PropertyChanged}"
+                 AcceptsReturn="True" AcceptsTab="True"
+                 VerticalScrollBarVisibility="Auto"
+                 FontFamily="Consolas, Courier New"
+                 Height="160"
+                 TextWrapping="NoWrap"/>
+
+        <CheckBox Margin="0,8,0,0" Content="Wait for script to finish before continuing"
+                  IsChecked="{Binding WaitForExit}"/>
+
+        <TextBlock Text="Label (optional note)" Margin="0,14,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <CheckBox Margin="0,10,0,0" Content="Step enabled"
+                  IsChecked="{Binding IsEnabled}"/>
+    </StackPanel>
+</UserControl>

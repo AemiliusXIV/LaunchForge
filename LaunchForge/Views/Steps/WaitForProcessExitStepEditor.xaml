@@ -1,0 +1,20 @@
+<UserControl x:Class="LaunchForge.Views.Steps.WaitForProcessExitStepEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="12" DataContext="{Binding}">
+
+        <TextBlock Text="Wait until this process exits" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding ProcessName, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock Text="Timeout (seconds, 0 = wait indefinitely)" Margin="0,10,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
+                 Width="80" HorizontalAlignment="Left"/>
+
+        <TextBlock Text="Label (optional note)" Margin="0,14,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <CheckBox Margin="0,10,0,0" Content="Step enabled"
+                  IsChecked="{Binding IsEnabled}"/>
+    </StackPanel>
+</UserControl>

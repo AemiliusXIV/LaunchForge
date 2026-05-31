@@ -1,0 +1,19 @@
+<UserControl x:Class="LaunchForge.Views.Steps.KillProcessStepEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="12" DataContext="{Binding}">
+
+        <TextBlock Text="Process name (without .exe)" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding ProcessName, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock Margin="0,6,0,0" Foreground="Gray" FontSize="11"
+                   Text="e.g. 'steam', 'chrome', 'EDMarketConnector'. The .exe suffix is added automatically."/>
+
+        <TextBlock Text="Label (optional note)" Margin="0,14,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <CheckBox Margin="0,10,0,0" Content="Step enabled"
+                  IsChecked="{Binding IsEnabled}"/>
+    </StackPanel>
+</UserControl>

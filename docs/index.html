@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaunchForge</title>
+    <meta name="description" content="Build app-launch sequences and export them as .bat or .ps1 scripts. No install.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="logo">⚙</span>
+            <span class="title">LaunchForge</span>
+        </div>
+
+        <div class="seq-name">
+            <label for="seqName">Sequence</label>
+            <input id="seqName" type="text" value="Untitled Sequence" autocomplete="off">
+        </div>
+
+        <div class="toolbar">
+            <button id="btnHelp"      class="btn btn-help" data-tip="New here? Open the quick guide.">? Help</button>
+            <span class="sep"></span>
+            <button id="btnNew"       class="btn" data-tip="Start over with an empty sequence.">New</button>
+            <button id="btnImport"    class="btn" data-tip="Load a saved .lfjson project, or an existing .bat or .ps1 script to edit.">Import</button>
+            <button id="btnSaveProj"  class="btn" data-tip="Save your sequence as a project file you can reopen and edit later.">Save .lfjson</button>
+            <span class="sep"></span>
+            <button id="btnExportBat" class="btn btn-primary" data-tip="Download a .bat file. Double-click it to run your sequence.">Export .bat</button>
+            <button id="btnExportPs1" class="btn" data-tip="Download a PowerShell .ps1 file, for people who prefer PowerShell.">Export .ps1</button>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- Step list -->
+        <section class="panel steps-panel">
+            <div class="panel-head">
+                <span>Steps <span class="help-badge" tabindex="0" data-tip="Steps run from top to bottom. Click one to edit it, and use the arrows below to reorder.">?</span></span>
+                <div class="add-wrap">
+                    <button id="btnAdd" class="btn btn-add">+ Add</button>
+                    <div id="addMenu" class="add-menu hidden"></div>
+                </div>
+            </div>
+            <ul id="stepList" class="step-list"></ul>
+            <div class="step-controls">
+                <button id="btnUp"     class="btn small" title="Move up">▲</button>
+                <button id="btnDown"   class="btn small" title="Move down">▼</button>
+                <button id="btnRemove" class="btn small danger" title="Remove">✕</button>
+            </div>
+        </section>
+
+        <!-- Step editor -->
+        <section class="panel editor-panel">
+            <div class="panel-head"><span>Edit step <span class="help-badge" tabindex="0" data-tip="Details for the selected step. Hover the ? icons next to each box for guidance.">?</span></span></div>
+            <div id="editor" class="editor">
+                <p class="placeholder">Select a step to edit it, or click <strong>+ Add</strong> to create one.</p>
+            </div>
+        </section>
+
+        <!-- Live preview -->
+        <section class="panel preview-panel">
+            <div class="panel-head">
+                <span>Preview <span class="help-badge" tabindex="0" data-tip="A live look at the script your sequence produces. Export it with the buttons up top.">?</span></span>
+                <div class="tabs">
+                    <button id="tabBat" class="tab active" data-fmt="bat">.bat</button>
+                    <button id="tabPs1" class="tab" data-fmt="ps1">.ps1</button>
+                </div>
+            </div>
+            <pre id="preview" class="preview"></pre>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Runs entirely in your browser. Nothing is uploaded.</span>
+        <span class="affil">Independent project, not affiliated with Valve or Microsoft. Steam is a trademark of Valve Corporation.</span>
+        <span>Developed by <a href="https://github.com/AemiliusXIV/LaunchForge" target="_blank" rel="noopener">AemiliusXIV</a></span>
+    </footer>
+
+    <!-- Help / guide -->
+    <div id="helpModal" class="modal hidden">
+        <div class="modal-card help-card">
+            <div class="modal-head">
+                <span>How LaunchForge works</span>
+                <button id="helpClose" class="btn small">✕</button>
+            </div>
+            <div class="help-body">
+                <h3>What it does</h3>
+                <p>LaunchForge builds a launch sequence: a list of things to do in order, such as open a program, wait a few seconds, then start a game. It turns that list into a <code>.bat</code> (or <code>.ps1</code>) script you download and double-click to run. Nothing runs from this page and nothing is uploaded; the script runs on your own PC.</p>
+
+                <h3>Quick start</h3>
+                <ol>
+                    <li>Click <strong>+ Add</strong> and choose a step, such as <em>Launch App</em> or <em>Launch Steam Game</em>.</li>
+                    <li>Fill in its details on the right. Hover any <span class="help-badge">?</span> for guidance.</li>
+                    <li>Add more steps and reorder them with the <strong>&#9650; &#9660;</strong> arrows. They run top to bottom.</li>
+                    <li>Watch the <strong>Preview</strong> update as you go.</li>
+                    <li>Click <strong>Export .bat</strong>, then double-click the downloaded file to run your sequence.</li>
+                </ol>
+                <p><a id="helpLoadExample">Load an example sequence</a> to see how it fits together.</p>
+
+                <h3>The steps</h3>
+                <ul>
+                    <li><span class="tag-key">APP</span> Launch App: open a program or shortcut.</li>
+                    <li><span class="tag-key">STEAM</span> Launch Steam Game: start a game by its App ID.</li>
+                    <li><span class="tag-key">WAIT</span> Wait: pause for a number of seconds.</li>
+                    <li><span class="tag-key">KILL</span> Kill Process: force-close a program.</li>
+                    <li><span class="tag-key">WAIT+</span> Wait for Process Start: pause until a program is running.</li>
+                    <li><span class="tag-key">WAIT-</span> Wait for Process Exit: pause until a program closes.</li>
+                    <li><span class="tag-key">PS</span> Run PowerShell: advanced, run your own commands.</li>
+                </ul>
+
+                <h3>Adding a program</h3>
+                <p>For <em>Launch App</em>, the quickest way to get the path is to find the program in your Start menu or on your desktop, right-click it, choose <strong>Copy as path</strong>, and paste it into the path box. LaunchForge strips the surrounding quotes for you.</p>
+
+                <h3>Steam games</h3>
+                <p>Use <strong>Pick game</strong> to search the full Steam catalogue by name, or paste an App ID. Launching by App ID keeps working even if you later move or delete a desktop shortcut.</p>
+
+                <div class="callout">Scripts can open, close, and interact with programs on your PC. Only run scripts you built yourself or trust the source of, and have a quick read of the Preview before running.</div>
+
+                <h3>Saving and reopening</h3>
+                <p><strong>Save .lfjson</strong> keeps your sequence as a project file. <strong>Import</strong> loads one back, and it can also read an existing <code>.bat</code> or <code>.ps1</code> so you can pick up where you left off.</p>
+            </div>
+            <div class="modal-foot">
+                <span class="muted">Reopen this any time with the <strong>? Help</strong> button.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Steam picker dialog -->
+    <div id="steamModal" class="modal hidden">
+        <div class="modal-card">
+            <div class="modal-head">
+                <span>Pick a Steam game</span>
+                <button id="steamClose" class="btn small">✕</button>
+            </div>
+            <input id="steamFilter" class="steam-filter" type="text" placeholder="Search by name or App ID…" autocomplete="off">
+            <ul id="steamList" class="steam-list"></ul>
+            <div class="modal-foot">
+                <span id="steamStatus" class="muted"></span>
+                <div class="manual">
+                    <label for="steamManual">Or type App ID:</label>
+                    <input id="steamManual" type="text" inputmode="numeric" autocomplete="off">
+                    <button id="steamUseManual" class="btn small">Use</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input id="fileInput" type="file" accept=".lfjson,.json,.bat,.cmd,.ps1" class="hidden">
+
+    <div id="toastHost"></div>
+
+    <script src="js/steps.js"></script>
+    <script src="js/scriptgen.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/steam.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

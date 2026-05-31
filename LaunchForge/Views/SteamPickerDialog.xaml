@@ -1,0 +1,79 @@
+<Window x:Class="LaunchForge.Views.SteamPickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pick Steam Game"
+        Width="480" Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- filter -->
+            <RowDefinition Height="*"/>     <!-- list -->
+            <RowDefinition Height="Auto"/>  <!-- status + refresh -->
+            <RowDefinition Height="Auto"/>  <!-- manual App ID -->
+            <RowDefinition Height="Auto"/>  <!-- buttons -->
+        </Grid.RowDefinitions>
+
+        <!-- Search filter -->
+        <Grid Grid.Row="0" Margin="0,0,0,6">
+            <TextBox x:Name="FilterBox"
+                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="Search by name or App ID…" IsHitTestVisible="False"
+                       Foreground="Gray" Margin="4,0,0,0" VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FilterText}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <!-- Game list -->
+        <ListBox Grid.Row="1"
+                 ItemsSource="{Binding FilteredGames}"
+                 SelectedItem="{Binding SelectedGame}"
+                 MouseDoubleClick="ListBox_DoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="★ " Foreground="#1E88E5"
+                                   Visibility="{Binding IsInstalled, Converter={StaticResource BoolVis}}"/>
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="  ·  " Foreground="Gray"/>
+                        <TextBlock Text="{Binding AppId}" Foreground="Gray"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Status + refresh -->
+        <DockPanel Grid.Row="2" Margin="0,6,0,4">
+            <Button DockPanel.Dock="Right" Content="Refresh catalog" Padding="8,3"
+                    Command="{Binding RefreshCatalogCommand}"
+                    IsEnabled="{Binding IsRefreshing, Converter={StaticResource InvertBool}}"/>
+            <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center"
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="0,0,8,0"/>
+        </DockPanel>
+
+        <!-- Manual App ID fallback -->
+        <DockPanel Grid.Row="3" Margin="0,0,0,10">
+            <TextBlock DockPanel.Dock="Left" Text="Or type App ID:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="Gray" FontSize="11"/>
+            <TextBox Text="{Binding ManualAppId, UpdateSourceTrigger=PropertyChanged}" FontSize="11"/>
+        </DockPanel>
+
+        <!-- OK / Cancel -->
+        <DockPanel Grid.Row="4">
+            <Button DockPanel.Dock="Right" Content="Cancel" Margin="6,0,0,0" Width="80"
+                    IsCancel="True"/>
+            <Button DockPanel.Dock="Right" Content="Select" Width="80"
+                    IsDefault="True" Click="Select_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

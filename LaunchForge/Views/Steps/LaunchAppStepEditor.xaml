@@ -1,0 +1,52 @@
+<UserControl x:Class="LaunchForge.Views.Steps.LaunchAppStepEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:h="clr-namespace:LaunchForge.Helpers">
+
+    <StackPanel Margin="12" DataContext="{Binding}">
+
+        <!-- Path -->
+        <TextBlock Text="Executable / Shortcut path" Style="{StaticResource FieldLabel}"/>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Content="Browse…" Margin="4,0,0,0"
+                    Click="Browse_Click"/>
+            <TextBox h:PathInputBehavior.Enabled="True"
+                     Text="{Binding ExePath, UpdateSourceTrigger=PropertyChanged}"/>
+        </DockPanel>
+
+        <!-- Desktop / Steam warning -->
+        <Border Margin="0,6,0,0" Padding="8,6" CornerRadius="4"
+                Background="#FFF3CD" BorderBrush="#FFDFA0" BorderThickness="1"
+                Visibility="{Binding IsDesktopWarning, Converter={StaticResource BoolVis}}">
+            <StackPanel>
+                <TextBlock TextWrapping="Wrap" Foreground="#7A4E00"
+                           Text="⚠  This path points to a desktop shortcut. If the shortcut is removed the script will break."/>
+
+                <!-- Steam convert suggestion -->
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                            Visibility="{Binding IsSteamConvertSuggestion, Converter={StaticResource BoolVis}}">
+                    <TextBlock TextWrapping="Wrap" Foreground="#7A4E00" VerticalAlignment="Center"
+                               Text="{Binding SuggestedSteamAppId, StringFormat='The target appears to be a Steam game (App ID {0}). Use a Launch Steam step so it won\'t break if the shortcut is deleted.'}"/>
+                    <Button Margin="8,0,0,0" Content="Convert automatically →"
+                            Command="{Binding ConvertToSteamCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Arguments -->
+        <TextBlock Text="Arguments (optional)" Margin="0,10,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Arguments, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <!-- Wait for exit -->
+        <CheckBox Margin="0,10,0,0" Content="Wait for this process to exit before continuing"
+                  IsChecked="{Binding WaitForExit}"/>
+
+        <!-- Label -->
+        <TextBlock Text="Label (optional note)" Margin="0,14,0,2" Style="{StaticResource FieldLabel}"/>
+        <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <!-- Enabled -->
+        <CheckBox Margin="0,10,0,0" Content="Step enabled"
+                  IsChecked="{Binding IsEnabled}"/>
+    </StackPanel>
+</UserControl>
