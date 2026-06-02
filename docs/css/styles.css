@@ -427,4 +427,8 @@ textarea { width: 100%; resize: vertical; font-family: var(--mono); }
 
 .footer .affil { text-align: center; flex: 1; }
 
+/* AV notice modal footer: checkbox left, button right */
+.av-foot { flex-direction: row; align-items: center; justify-content: space-between; }
+.av-dontshow { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 13px; cursor: pointer; }
+
 .hidden { display: none !important; }

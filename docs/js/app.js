@@ -284,17 +284,28 @@ function safeName() {
     return (state.name || "sequence").replace(/[^\w.\- ]+/g, "_").trim() || "sequence";
 }
 
-function exportBat() {
+// Export is gated by a one-time antivirus heads-up (unless dismissed).
+let pendingExportFmt = null;
+
+function requestExport(fmt) {
     if (!state.steps.length) { toast("Add at least one step before exporting."); return; }
-    const name = safeName() + ".bat";
-    download(name, generateBat(currentSequence()));
-    toast(`Downloaded ${name}. Find it in your Downloads folder and double-click to run.`);
+    let dismissed = false;
+    try { dismissed = !!localStorage.getItem("lf_av_ack"); } catch { /* storage blocked */ }
+    if (dismissed) { performExport(fmt); return; }
+    pendingExportFmt = fmt;
+    document.getElementById("avModal").classList.remove("hidden");
 }
-function exportPs1() {
-    if (!state.steps.length) { toast("Add at least one step before exporting."); return; }
-    const name = safeName() + ".ps1";
-    download(name, generatePs1(currentSequence()));
-    toast(`Downloaded ${name}. Right-click it and choose "Run with PowerShell".`);
+
+function performExport(fmt) {
+    if (fmt === "ps1") {
+        const name = safeName() + ".ps1";
+        download(name, generatePs1(currentSequence()));
+        toast(`Downloaded ${name}. Right-click it and choose "Run with PowerShell".`);
+    } else {
+        const name = safeName() + ".bat";
+        download(name, generateBat(currentSequence()));
+        toast(`Downloaded ${name}. Find it in your Downloads folder and double-click to run.`);
+    }
 }
 
 function saveProject() {
@@ -470,8 +481,8 @@ function init() {
     document.getElementById("btnDown").addEventListener("click", () => moveStep(1));
     document.getElementById("btnRemove").addEventListener("click", removeStep);
 
-    document.getElementById("btnExportBat").addEventListener("click", exportBat);
-    document.getElementById("btnExportPs1").addEventListener("click", exportPs1);
+    document.getElementById("btnExportBat").addEventListener("click", () => requestExport("bat"));
+    document.getElementById("btnExportPs1").addEventListener("click", () => requestExport("ps1"));
     document.getElementById("btnSaveProj").addEventListener("click", saveProject);
     document.getElementById("btnNew").addEventListener("click", newSequence);
 
@@ -487,7 +498,29 @@ function init() {
         if (e.target.id === "helpModal") closeHelp();
     });
     document.getElementById("helpLoadExample").addEventListener("click", loadExample);
-    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeHelp(); Steam && document.getElementById("steamModal").classList.add("hidden"); } });
+
+    // Antivirus heads-up before the first download
+    const avModal = document.getElementById("avModal");
+    const closeAv = () => { avModal.classList.add("hidden"); pendingExportFmt = null; };
+    document.getElementById("avClose").addEventListener("click", closeAv);
+    avModal.addEventListener("click", e => { if (e.target.id === "avModal") closeAv(); });
+    document.getElementById("avDownload").addEventListener("click", () => {
+        if (document.getElementById("avDontShow").checked) {
+            try { localStorage.setItem("lf_av_ack", "1"); } catch { /* storage blocked */ }
+        }
+        avModal.classList.add("hidden");
+        const fmt = pendingExportFmt;
+        pendingExportFmt = null;
+        if (fmt) performExport(fmt);
+    });
+
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            closeHelp();
+            closeAv();
+            document.getElementById("steamModal").classList.add("hidden");
+        }
+    });
 
     for (const tab of document.querySelectorAll(".tab")) {
         tab.addEventListener("click", () => {

@@ -125,6 +125,31 @@
         </div>
     </div>
 
+    <!-- Antivirus / SmartScreen heads-up before download -->
+    <div id="avModal" class="modal hidden">
+        <div class="modal-card">
+            <div class="modal-head">
+                <span>Before you run this</span>
+                <button id="avClose" class="btn small">✕</button>
+            </div>
+            <div class="help-body">
+                <p>Your antivirus or Windows SmartScreen may warn about this script. That is expected, and it does not mean something is wrong.</p>
+                <p>A launch script starts programs, and can close them or run PowerShell. That behaviour resembles what some malware does, so security tools sometimes flag any script that does it, even a harmless one. This is a false positive.</p>
+                <p>It is safe to run because:</p>
+                <ul>
+                    <li>You built this sequence yourself.</li>
+                    <li>The script is plain text you can read in full. Check the <strong>Preview</strong> before running it.</li>
+                    <li>Nothing is hidden, and nothing is sent anywhere.</li>
+                </ul>
+                <p>If a warning appears: on SmartScreen click <strong>More info</strong> then <strong>Run anyway</strong>; in your antivirus, choose to allow or whitelist the file.</p>
+            </div>
+            <div class="modal-foot av-foot">
+                <label class="av-dontshow"><input type="checkbox" id="avDontShow"> Don't show this again</label>
+                <button id="avDownload" class="btn btn-primary">Download</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Steam picker dialog -->
     <div id="steamModal" class="modal hidden">
         <div class="modal-card">
