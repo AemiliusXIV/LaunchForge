@@ -329,6 +329,7 @@ function importProject(file) {
         state.steps = res.steps;
         state.selectedIndex = 0;
         renderAll();
+        resolveSteamNames();
 
         if (res.warnings.length) {
             const shown = res.warnings.slice(0, 12).join("\n");
@@ -338,6 +339,21 @@ function importProject(file) {
         }
     };
     reader.readAsText(file);
+}
+
+// After an import, the catalog usually isn't loaded yet, so Launch Steam steps
+// come in with just an App ID. Load it (once) and backfill the game names.
+function resolveSteamNames() {
+    const pending = state.steps.filter(s => s.Type === "LaunchSteam" && s.appId && !s.gameName);
+    if (!pending.length) return;
+    Steam.load().then(() => {
+        let changed = false;
+        for (const s of pending) {
+            const name = Steam.nameForAppId(s.appId);
+            if (name) { s.gameName = name; changed = true; }
+        }
+        if (changed) renderAll();
+    });
 }
 
 function newSequence() {
