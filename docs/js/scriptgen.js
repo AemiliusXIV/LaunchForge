@@ -69,7 +69,9 @@ function toBatLine(step) {
         case "LaunchSteam":
             return `start "" "steam://rungameid/${s.appId}"`;
         case "Wait":
-            return `timeout /t ${s.seconds} /nobreak`;
+            // ping the loopback as a sleep: N+1 pings is ~N seconds, and unlike
+            // `timeout` it doesn't read console stdin (which other apps can corrupt)
+            return `ping -n ${s.seconds + 1} 127.0.0.1 >nul`;
         case "KillProcess":
             return `taskkill /f /im "${ensureExe(s.processName)}"`;
         case "WaitForProcessStart":
