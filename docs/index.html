@@ -66,6 +66,7 @@
                     <button id="tabPs1" class="tab" data-fmt="ps1">.ps1</button>
                 </div>
             </div>
+            <div id="ps1Hint" class="ps1-hint hidden">This sequence has a <strong>Run PowerShell</strong> step. Exporting as <strong>.ps1</strong> handles that more cleanly than <code>.bat</code>.</div>
             <pre id="preview" class="preview"></pre>
         </section>
     </main>
@@ -113,6 +114,32 @@
 
                 <h3>Steam games</h3>
                 <p>Use <strong>Pick game</strong> to search the full Steam catalogue by name, or paste an App ID. Launching by App ID keeps working even if you later move or delete a desktop shortcut.</p>
+
+                <h3>Which file: .bat or .ps1?</h3>
+                <p>Both produce the same launch sequence. The difference is how you run them:</p>
+                <ul>
+                    <li><strong><code>.bat</code> (recommended for most people)</strong>: double-click and it runs, no setup. Best for straightforward launches and waits, and for sharing with others.</li>
+                    <li><strong><code>.ps1</code> (PowerShell)</strong>: better when a sequence includes a <strong>Run PowerShell</strong> step, or when a launched program is noisy (some game launchers flood the window or hold it open under <code>.bat</code>). The catch: Windows will not run a <code>.ps1</code> on double-click, and may block it. See the next section.</li>
+                </ul>
+                <p>Rule of thumb: start with <code>.bat</code>. Reach for <code>.ps1</code> only if you have a Run PowerShell step or a launcher misbehaves under <code>.bat</code>.</p>
+
+                <h3>Running a .ps1 (and making a shortcut for it)</h3>
+                <p>Double-clicking a <code>.ps1</code> opens it in Notepad rather than running it, and Windows' execution policy can block it. To run it on demand, make a shortcut that calls PowerShell directly:</p>
+                <ol>
+                    <li>Save your exported <code>.ps1</code> somewhere it will stay put.</li>
+                    <li>Paste that folder's path below to get a ready-to-use shortcut target.</li>
+                    <li>Right-click your Desktop, choose <strong>New &rarr; Shortcut</strong>, paste the target, and give it a name.</li>
+                </ol>
+                <div class="fmt">
+                    <label class="fld-label" for="fmtFolder">Folder where you will keep the script</label>
+                    <input id="fmtFolder" type="text" placeholder="C:\Users\you\Scripts" autocomplete="off">
+                    <label class="fld-label" for="fmtOut">Shortcut target (paste this into the shortcut's Target box)</label>
+                    <div class="fmt-out-row">
+                        <input id="fmtOut" type="text" readonly>
+                        <button id="fmtCopy" class="btn small">Copy</button>
+                    </div>
+                    <div class="hint">Uses the current sequence name. If you move the script later, redo this to refresh the target.</div>
+                </div>
 
                 <div class="callout">Scripts can open, close, and interact with programs on your PC. Only run scripts you built yourself or trust the source of, and have a quick read of the Preview before running.</div>
 

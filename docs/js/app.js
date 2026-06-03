@@ -224,6 +224,9 @@ function renderPreview() {
     el.preview.textContent = state.previewFmt === "bat"
         ? generateBat(seq)
         : generatePs1(seq);
+    // Nudge toward .ps1 only when there's a Run PowerShell step (the one honest signal)
+    const hint = document.getElementById("ps1Hint");
+    if (hint) hint.classList.toggle("hidden", !state.steps.some(s => s.Type === "RunPowerShell"));
 }
 
 function renderAll() {
@@ -445,8 +448,21 @@ function toast(message, ms = 5000) {
 
 // ── Help modal + example ──
 
-function openHelp()  { document.getElementById("helpModal").classList.remove("hidden"); }
+function openHelp()  { updateShortcutFormatter(); document.getElementById("helpModal").classList.remove("hidden"); }
 function closeHelp() { document.getElementById("helpModal").classList.add("hidden"); }
+
+// Builds a copy-paste shortcut Target that runs the sequence's .ps1 via PowerShell.
+function updateShortcutFormatter() {
+    const folderEl = document.getElementById("fmtFolder");
+    const outEl = document.getElementById("fmtOut");
+    if (!folderEl || !outEl) return;
+    let folder = (folderEl.value || "").trim();
+    if (folder.length > 1 && folder.startsWith('"') && folder.endsWith('"')) folder = folder.slice(1, -1);
+    folder = folder.replace(/[\\/]+$/, "");
+    const file = safeName() + ".ps1";
+    const target = folder ? `${folder}\\${file}` : file;
+    outEl.value = `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${target}"`;
+}
 
 function loadExample() {
     closeHelp();
@@ -498,6 +514,17 @@ function init() {
         if (e.target.id === "helpModal") closeHelp();
     });
     document.getElementById("helpLoadExample").addEventListener("click", loadExample);
+    document.getElementById("fmtFolder").addEventListener("input", updateShortcutFormatter);
+    document.getElementById("fmtCopy").addEventListener("click", () => {
+        const out = document.getElementById("fmtOut");
+        out.select();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(out.value).then(() => toast("Shortcut target copied."));
+        } else {
+            document.execCommand("copy");
+            toast("Shortcut target copied.");
+        }
+    });
 
     // Antivirus heads-up before the first download
     const avModal = document.getElementById("avModal");
