@@ -29,6 +29,8 @@ public static class ScriptGenerator
             if (!step.IsEnabled)
             {
                 sb.AppendLine($":: [DISABLED] {comment}");
+                foreach (var line in ToBatLine(step).Split('\n'))
+                    sb.AppendLine($":: {line.TrimEnd('\r')}");
                 sb.AppendLine();
                 continue;
             }
@@ -136,6 +138,8 @@ public static class ScriptGenerator
             if (!step.IsEnabled)
             {
                 sb.AppendLine($"# [DISABLED] {comment}");
+                foreach (var line in ToPs1Block(step).Split('\n'))
+                    sb.AppendLine($"# {line.TrimEnd('\r')}");
                 sb.AppendLine();
                 continue;
             }

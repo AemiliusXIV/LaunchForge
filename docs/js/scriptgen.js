@@ -46,6 +46,8 @@ function generateBat(seq) {
         const comment = step.label ? `${stepTypeName(step)}: ${step.label}` : stepTypeName(step);
         if (!step.isEnabled) {
             out.push(`:: [DISABLED] ${comment}`);
+            // keep the would-be command commented out, so import can restore the step
+            for (const line of toBatLine(step).split(/\r?\n/)) out.push(`:: ${line}`);
             out.push("");
             return;
         }
@@ -127,6 +129,7 @@ function generatePs1(seq) {
         const comment = step.label ? `${stepTypeName(step)}: ${step.label}` : stepTypeName(step);
         if (!step.isEnabled) {
             out.push(`# [DISABLED] ${comment}`);
+            for (const line of toPs1Block(step).split(/\r?\n/)) out.push(`# ${line}`);
             out.push("");
             return;
         }

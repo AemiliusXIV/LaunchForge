@@ -124,6 +124,27 @@ const Parser = (() => {
                 label = idx >= 0 ? c.slice(idx + 1).trim() : "";
                 continue;
             }
+            // Disabled step: its command sits commented out on the next lines; rebuild it
+            let dm;
+            if (dm = line.match(/^::\s*\[DISABLED\]\s*(.*)$/i)) {
+                const idx = dm[1].indexOf(":");
+                const dlabel = idx >= 0 ? dm[1].slice(idx + 1).trim() : "";
+                const cmd = [];
+                while (i + 1 < lines.length) {
+                    const t = lines[i + 1].trim();
+                    if (!t) break;
+                    const cm = t.match(/^::\s?(.*)$/);
+                    if (!cm) break;
+                    cmd.push(cm[1]);
+                    i++;
+                }
+                for (const st of parseBat(cmd.join("\n")).steps) {
+                    st.isEnabled = false;
+                    if (!st.label) st.label = dlabel;
+                    steps.push(st);
+                }
+                continue;
+            }
             // Boilerplate and comments
             if (low.startsWith("::") || low.startsWith("rem ") || low === "@echo off" ||
                 low.startsWith("setlocal") || low === "endlocal" ||
@@ -259,6 +280,27 @@ const Parser = (() => {
                 const c = m[1];
                 const idx = c.indexOf(":");
                 label = idx >= 0 ? c.slice(idx + 1).trim() : "";
+                continue;
+            }
+            // Disabled step: its command sits commented out on the next lines; rebuild it
+            let dm;
+            if (dm = line.match(/^#\s*\[DISABLED\]\s*(.*)$/i)) {
+                const idx = dm[1].indexOf(":");
+                const dlabel = idx >= 0 ? dm[1].slice(idx + 1).trim() : "";
+                const cmd = [];
+                while (i + 1 < lines.length) {
+                    const t = lines[i + 1].trim();
+                    if (!t) break;
+                    const cm = t.match(/^#\s?(.*)$/);
+                    if (!cm) break;
+                    cmd.push(cm[1]);
+                    i++;
+                }
+                for (const st of parsePs1(cmd.join("\n")).steps) {
+                    st.isEnabled = false;
+                    if (!st.label) st.label = dlabel;
+                    steps.push(st);
+                }
                 continue;
             }
             if (low.startsWith("#") || low.startsWith("set-strictmode") || /^write-host\s+'all done\.'/i.test(line)) continue;
