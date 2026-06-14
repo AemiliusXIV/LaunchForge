@@ -44,7 +44,7 @@ const STEP_TYPES = {
         defaults: { seconds: 5 },
         fields: [
             { key: "seconds", type: "number", label: "Seconds to wait", min: 1,
-              info: "How long to pause before running the next step, for example to let a program finish loading. In the exported .bat the pause is a quick ping to your own PC (127.0.0.1), which is the standard, reliable way to wait in a batch script; the .ps1 uses Start-Sleep. Either way it only waits, and nothing is sent anywhere." },
+              info: "How long to pause before running the next step, for example to let a program finish loading. The exported .bat uses Windows' timeout command (its countdown hidden with >nul); the .ps1 uses Start-Sleep." },
         ],
         summary: s => s.seconds + "s",
     },

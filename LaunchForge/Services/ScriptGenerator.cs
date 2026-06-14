@@ -56,9 +56,8 @@ public static class ScriptGenerator
             $"start \"\" \"steam://rungameid/{s.AppId}\"",
 
         WaitStep s =>
-            // ping the loopback as a sleep: N+1 pings is ~N seconds, and unlike
-            // 'timeout' it doesn't read console stdin (which other apps can corrupt)
-            $"ping -n {s.Seconds + 1} 127.0.0.1 >nul",
+            // >nul hides the countdown so concurrent console output can't garble it
+            $"timeout /t {s.Seconds} /nobreak >nul",
 
         KillProcessStep s =>
             $"taskkill /f /im \"{EnsureExe(s.ProcessName)}\"",
